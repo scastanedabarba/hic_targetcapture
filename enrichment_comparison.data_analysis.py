@@ -12,6 +12,7 @@ import matplotlib.ticker as ticker
 import copy
 import random
 from Bio import SeqIO
+from hic_functions import extract_links, update_counts, check_alt
 
 def extract_links(bam_file):
     """

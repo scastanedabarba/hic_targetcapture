@@ -9,6 +9,10 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --array=0-5
 
+source /usr/modules/init/bash
+module load fastqc
+module load python/3.6.7
+
 #change to directory where raw data is stored 
 cd ../01_raw_data
 
@@ -22,6 +26,13 @@ FILES=(*R1.fastq.gz)
 
 #run array job for each file
 srun bash enrichment_comparison.alignment.sh ${FILES[SLURM_ARRAY_TASK_ID]}
+
+#run fastqc and multiqc
+fastqc *fastq.gz -o ../04_fastqc/untrimmed/
+fastqc ../03_trimmed_reads/*fastq.gz -o ../04_fastqc/trimmed/
+
+multiqc ../04_fastqc/trimmed/* -n trimmed
+multiqc ../04_fastqc/untrimmed/* -n untrimmed
 
 #run python script for doing count data
 python3 enrichment_comparison.data_analysis.py

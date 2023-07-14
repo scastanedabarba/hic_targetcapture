@@ -4,7 +4,6 @@
 module load samtools
 module load bwa
 module load samblaster
-module load fastqc
 module load fastp
 
 #move to directory where raw data is
