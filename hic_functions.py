@@ -1,7 +1,6 @@
 def extract_links(bam_file):
     """
-    Function to be applied to file after matlock filtering, no unaligned reads should be present.
-    Takes a bam file as input and returns the counts for the links present.
+    Function to loop over paired end reads and generate data for downstream analysis. Soft clipped reads remain in downstream steps
     """
     print('Starting ', bam_file)
     samfile = pysam.AlignmentFile(bam_file, 'rb')
@@ -12,12 +11,11 @@ def extract_links(bam_file):
     pB10_pputida = 0
     ecoli_ecoli = 0
     pputida_pputida = 0
-    multimapped = 0
     pairs = []
     
     #ecoli_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/'+bam_file+'ecoli_pb10_chromosome.fasta','w')
     #pputida_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/'+bam_file+'pputida_pb10_chromosome.fasta','w')
-    
+  
     #lists that store the location on the pB10 genome of each aligned read
     pB10_pB10_loc = []
     pB10_pputida_loc = []
@@ -51,14 +49,11 @@ def extract_links(bam_file):
             cigar = read.cigarstring
             match = str(length)+'M'
             loc = read.reference_start
-            if cigar != match:
-                genome='unaligned'
         pairs.append([name, genome, loc, length, read.get_tags(), read.query_sequence])
         if count % 2 == 0:
             r1_multimapped = check_alt(pairs[0][1], pairs[0][4], pairs[0][3])
             r2_multimapped = check_alt(pairs[1][1], pairs[1][4], pairs[1][3])
             if len(r1_multimapped) > 1 or len(r2_multimapped) >1:
-                multimapped += 1
                 pairs = []
             else:
                 links = pairs[0][1] + pairs[1][1]
@@ -96,9 +91,9 @@ def extract_links(bam_file):
                 if links == 'P.PutidaP.Putida':
                     pputida_pputida += 1
                 pairs = []
-    print(np.array([count/2, multimapped, pB10_pB10, pB10_ecoli, pB10_pputida], '\n'))
+    print(np.array([count/2, pB10_pB10, pB10_ecoli, pB10_pputida], '\n'))
     print('\n')
-    return(np.array([[count/2, multimapped, pB10_pB10, pB10_ecoli, pB10_pputida],
+    return(np.array([[count/2, pB10_pB10, pB10_ecoli, pB10_pputida],
                     [p_putida, p_p, p_ecoli], 
                     [pB10_pputida_loc, pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc, pputida_pB10_loc]]))
 
