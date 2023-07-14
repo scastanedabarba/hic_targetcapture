@@ -25,6 +25,3 @@ srun bash enrichment_comparison.alignment.sh ${FILES[SLURM_ARRAY_TASK_ID]}
 
 #run python script for doing count data
 python3 enrichment_comparison.data_analysis.py
-
-#run script for visualization
-
