@@ -33,6 +33,3 @@ fastqc ../03_trimmed_reads/*fastq.gz -o ../04_fastqc/trimmed/
 
 multiqc ../04_fastqc/trimmed/* -n trimmed
 multiqc ../04_fastqc/untrimmed/* -n untrimmed
-
-#run python script for doing count data
-python3 enrichment_comparison.data_analysis.py
