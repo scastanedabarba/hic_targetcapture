@@ -1,25 +1,19 @@
 #!/bin/bash
 
-#import necessary modules
-module load samtools
-module load bwa
-module load samblaster
-module load fastp
-
-#move to directory where raw data is
-cd ../01_raw_data
-
-#
+#get name of file currently being worked on
 library=$1
-base=$(basename $libary _R1.fastq.gz)
+
+echo $library
+base=$(basename $library _R1.fastq.gz)
+echo $base
 
 #specify paths to input and output files
 genome=../02_ref_genomes/combined_genomes.fasta #bwa indexed reference genomes
-R1_in=../01_raw_data/${base}_R1.fastq.gz #R1
-R2_in=../01_raw_data/${base}_R2.fastq.gz #R2
+R1_in=${base}_R1.fastq.gz #R1
+R2_in=${base}_R2.fastq.gz #R2
 R1_trimmed=../03_trimmed_reads/${base}_R1.fastq.gz #trimmed R1
 R2_trimmed=../03_trimmed_reads/${base}_R2.fastq.gz #trimmed R2
-bam_out=../05_bwa_alignments/enrichment_comparison/${base}_aligned.bam #alignment file
+bam_out=../05_bwa_alignments/enrichment_comparison/unsorted/${base}_aligned.bam #alignment file
 sorted=../05_bwa_alignments/enrichment_comparison/sorted/${base}_sorted_aligned.bam #sorted alignment file (by name)
 
 #run fastp, bwa, and samtools
