@@ -1,16 +1,3 @@
-import pysam
-import pandas as pd
-import numpy as np
-import sys
-import matplotlib.pyplot as plt
-import os
-import matplotlib
-import matplotlib.gridspec as gridspec
-from matplotlib.offsetbox import AnchoredText
-import matplotlib.ticker as ticker
-import copy
-import random
-
 def extract_links(bam_file):
     """
     Function to be applied to file after matlock filtering, no unaligned reads should be present.
@@ -178,7 +165,4 @@ def check_alt(aligned, tags, length):
             for i in fmatch:
                 genomes.append(i)
     return(list(set(genomes)))
-
-os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/05_bwa_alignment')
-A_all = extract_links('B_aligned.bam')
 

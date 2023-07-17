@@ -10,8 +10,6 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --array=0-5
 
-makeblastdb -in ../07_blast/pb10_probes.fasta -parse_seqids -dbtype nucl -out ../07_blast/pb10_probe_db
-
 FILES=(../05_bwa_alignment/de_novo/*+_aligned*)
 
 srun bash identify_hosts.sh ${FILES[SLURM_ARRAY_TASK_ID]}

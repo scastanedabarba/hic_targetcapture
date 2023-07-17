@@ -21,11 +21,6 @@ taxonomy_out=../06_output/de_novo/${base}_lineage.txt
 #run python script to generate csv files
 python3 extract_hosts.py $input $read_df $pothosts
 
-#blast probes against unaligned reads
-blastn -query unaligned.fasta -db pb10_probe_db -out unaligned_search
-
-#python script for filtering blast output. Filter to exclude reads that had probes map and output filtered pothosts
-
 #run kraken and then output report and file with taxids
 kraken2 --db ~/kraken_standard --threads 32 --confidence .5 --report $kraken_report $pothosts > $kraken_out
 
