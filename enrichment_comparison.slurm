@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=enrichment_comparison
-#SBATCH -o array_test_%A_%a.out
-#SBATCH -e array_test_%A_%a.error
+#SBATCH -o enrichment_comparison_%A_%a.out
+#SBATCH -e enrichment_comparison_%A_%a.error
 #SBATCH -p eight
 #SBATCH --cpus-per-task=16
 #SBATCH --mail-user=cast9836@vandals.uidaho.edu
