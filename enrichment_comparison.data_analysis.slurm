@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=subsample
-#SBATCH -o out_%A-%a.out
-#SBATCH -e error_%A-%a.out
+#SBATCH --job-name=data_analysis
+#SBATCH -o data_analysis_%A-%a.out
+#SBATCH -e data_analysis_%A-%a.out
 #SBATCH -p reg
 #SBATCH --mail-user=cast9836@vandals.uidaho.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -10,4 +10,4 @@
 
 FILES=(../05_bwa_alignments/enrichment_comparison/sorted/*.bam)
 
-srun bash math_model.subsample.sh ${FILES[SLURM_ARRAY_TASK_ID]}
+srun bash enrichment_comparison.data_analysis.sh ${FILES[SLURM_ARRAY_TASK_ID]}

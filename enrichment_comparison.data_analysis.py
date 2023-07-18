@@ -1,6 +1,13 @@
+import pysam
+import pandas as pd
+import numpy as np
+import sys
+import os
+
 def extract_links(bam_file):
     """
-    Function to loop over paired end reads and generate data for downstream analysis
+    Function to be applied to file after matlock filtering, no unaligned reads should be present.
+    Takes a bam file as input and returns the counts for the links present.
     """
     print('Starting ', bam_file)
     samfile = pysam.AlignmentFile(bam_file, 'rb')
@@ -11,7 +18,11 @@ def extract_links(bam_file):
     pB10_pputida = 0
     ecoli_ecoli = 0
     pputida_pputida = 0
+    multimapped = 0
     pairs = []
+    
+    #ecoli_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/'+bam_file+'ecoli_pb10_chromosome.fasta','w')
+    #pputida_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/'+bam_file+'pputida_pb10_chromosome.fasta','w')
     
     #lists that store the location on the pB10 genome of each aligned read
     pB10_pB10_loc = []
@@ -44,10 +55,10 @@ def extract_links(bam_file):
             name = read.query_name
             genome = genomes.get(read.reference_name)
             cigar = read.cigarstring
-            match = str(length)+'M'
             loc = read.reference_start
-            if cigar != match:
-                genome='unaligned'
+            #match = str(length)+'M'
+            #if cigar != match:
+            #    genome='unaligned'
         pairs.append([name, genome, loc, length, read.get_tags(), read.query_sequence])
         if count % 2 == 0:
             r1_multimapped = check_alt(pairs[0][1], pairs[0][4], pairs[0][3])
@@ -91,11 +102,9 @@ def extract_links(bam_file):
                 if links == 'P.PutidaP.Putida':
                     pputida_pputida += 1
                 pairs = []
-    print(np.array([count/2, multimapped, pB10_pB10, pB10_ecoli, pB10_pputida], '\n'))
-    print('\n')
-    return(np.array([[count/2, multimapped, pB10_pB10, pB10_ecoli, pB10_pputida],
-                    [p_putida, p_p, p_ecoli], 
-                    [pB10_pputida_loc, pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc, pputida_pB10_loc]]))
+    return([[count/2, pB10_pB10, pB10_ecoli, pB10_pputida], 
+            [p_putida, p_p, p_ecoli], 
+            [pB10_pputida_loc, pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc, pputida_pB10_loc]])
 
 def update_counts(ref, link, start_index, length):
     """Function for updating the coverage list"""
@@ -174,3 +183,33 @@ def check_alt(aligned, tags, length):
             for i in fmatch:
                 genomes.append(i)
     return(list(set(genomes)))
+
+pb10_len = 68345
+p_p = [0]*pb10_len
+p_ecoli = [0]*pb10_len
+p_putida = [0]*pb10_len
+
+input_file = sys.argv[1]
+
+os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/05_bwa_alignments/enrichment_comparison/sorted/')
+results = extract_links(str(input_file))
+
+os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/enrichment_comparison/')
+
+file = input_file.split('_')[0]
+
+read_count = pd.DataFrame({'pb10_pb10': [results[0][1]],
+                           'pb10_ecoli': [results[0][2]],
+                           'pb10_pputida': [results[0][3]]})
+read_count.to_csv(file+'_read_count.csv', index=False)
+
+plasmid_coverage = pd.DataFrame({'pb10_pb10':results[1][0], 
+                                 'pb10_ecoli':results[1][1], 
+                                 'pb10_pputida':results[1][2]})
+plasmid_coverage.to_csv(file+'_plasmid_coverage.csv', index=False)
+
+with open(file+'_locations.txt', 'w') as file:
+    file.write('pB10_pputida_loc, pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc, pputida_pB10_loc\n')
+    for item in results[2]:
+        file.write(str(item))
+        file.write('\n')
