@@ -12,7 +12,7 @@ def extract_links(bam_file, out_name):
     print('Starting ', bam_file)
     samfile = pysam.AlignmentFile(bam_file, 'rb')
     count = 0
-    genomes = {'pB10::rfp_putative':'pB10', 'NC_002947.4':'P.Putida', 'NC_000913.3_gfp':'E.Coli'}
+    genomes = {'pB10::rfp_putative':'pB10', 'NC_000913.3_gfp':'E.Coli'}
     pB10_pB10 = 0
     pB10_ecoli = 0
     pB10_unaligned = 0
@@ -58,7 +58,6 @@ def extract_links(bam_file, out_name):
             r1_multimapped = check_alt(pairs[0][1], pairs[0][4], pairs[0][3])
             r2_multimapped = check_alt(pairs[1][1], pairs[1][4], pairs[1][3])
             if len(r1_multimapped) > 1 or len(r2_multimapped) >1:
-                multimapped += 1
                 pairs = []
             else:
                 links = pairs[0][1] + pairs[1][1]
@@ -85,12 +84,13 @@ def extract_links(bam_file, out_name):
                     pB10_unaligned += 1
                     data.append([pairs[0][0], links, pairs[0][5], pairs[0][3], 
                                  pairs[0][2], pairs[1][5], pairs[1][3], pairs[1][2]])
-                pairs = []
+                pairs = []                   
+                
     data_df = pd.DataFrame(data, columns=['seqid', 'link', 'R1','R1length','R1loc','R2','R2length','R2loc'])
-    data_df.to_csv(out_name)
+    data_df.to_csv(out_name+'_pb10_unaligned.csv')
     return([[count/2, pB10_pB10, pB10_ecoli, pB10_unaligned], 
             [p_p, p_ecoli], 
-            [pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc]])
+            [pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc]], data_df)
 
 def update_counts(ref, link, start_index, length):
     """Function for updating the coverage list"""
@@ -151,33 +151,44 @@ def check_alt(aligned, tags, length):
                 genomes.append(i)
     return(list(set(genomes)))
 
+def extract_pothosts(df, out_name):
+    output_file = open(out_name,'w')
+    set1_seqid = df[df['link']=='pB10unaligned']['seqid'].tolist()
+    set1_sequence = df[df['link']=='pB10unaligned']['R2'].tolist()
+    set2_seqid = df[df['link']=='unalignedpB10']['seqid'].tolist()
+    set2_sequence = df[df['link']=='unalignedpB10']['R1'].tolist()
+    all_seqid = set1_seqid + set2_seqid
+    all_sequence = set1_sequence + set2_sequence
+    for seqid, seq in zip (all_seqid, all_sequence):
+        output_file.write(">" + seqid + '\n' + seq + '\n') 
+
 pb10_len = 68345
 p_p = [0]*pb10_len
 p_ecoli = [0]*pb10_len
 p_unaligned = [0]*pb10_len
 
+os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/05_bwa_alignments/denovo/sorted/')
 input_file = sys.argv[1]
 file = input_file.split('_')[0]
 
-os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/05_bwa_alignments/enrichment_comparison/sorted/')
-results = extract_links(str(input_file), file)
+results, reads = extract_links(str(input_file), file)
 
-os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/enrichment_comparison/')
-
-file = input_file.split('_')[0]
+os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/denovo/')
 
 read_count = pd.DataFrame({'pb10_pb10': [results[0][1]],
                            'pb10_ecoli': [results[0][2]],
-                           'pb10_pputida': [results[0][3]]})
+                           'pB10_unaligned': [results[0][3]]})
 read_count.to_csv(file+'_read_count.csv', index=False)
 
 plasmid_coverage = pd.DataFrame({'pb10_pb10':results[1][0], 
-                                 'pb10_ecoli':results[1][1], 
-                                 'pb10_pputida':results[1][2]})
+                                 'pb10_ecoli':results[1][1]})
 plasmid_coverage.to_csv(file+'_plasmid_coverage.csv', index=False)
 
+
 with open(file+'_locations.txt', 'w') as file:
-    file.write('pB10_pputida_loc, pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc, pputida_pB10_loc\n')
+    file.write('pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc\n')
     for item in results[2]:
         file.write(str(item))
         file.write('\n')
+
+extract_pothosts(reads, file+"_pothosts.fasta")
