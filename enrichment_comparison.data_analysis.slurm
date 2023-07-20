@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=data_analysis
 #SBATCH -o data_analysis_%A-%a.out
-#SBATCH -e data_analysis_%A-%a.out
+#SBATCH -e data_analysis_%A-%a.error
 #SBATCH -p reg
 #SBATCH --mail-user=cast9836@vandals.uidaho.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
