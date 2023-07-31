@@ -12,6 +12,7 @@ def extract_links(bam_file):
     print('Starting ', bam_file)
     samfile = pysam.AlignmentFile(bam_file, 'rb')
     count = 0
+    name = bam_file.split('_')[0]
     genomes = {'pB10::rfp_putative':'pB10', 'NC_002947.4':'P.Putida', 'NC_000913.3_gfp':'E.Coli'}
     pB10_pB10 = 0
     pB10_ecoli = 0
@@ -21,8 +22,8 @@ def extract_links(bam_file):
     multimapped = 0
     pairs = []
     
-    #ecoli_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/'+bam_file+'ecoli_pb10_chromosome.fasta','w')
-    #pputida_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/'+bam_file+'pputida_pb10_chromosome.fasta','w')
+    ecoli_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/enrichment_comparison/'+name+'ecoli_pb10_chromosome.fasta','w')
+    pputida_file = open('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/enrichment_comparison/'+name+'pputida_pb10_chromosome.fasta','w')
     
     #lists that store the location on the pB10 genome of each aligned read
     pB10_pB10_loc = []
@@ -56,9 +57,9 @@ def extract_links(bam_file):
             genome = genomes.get(read.reference_name)
             cigar = read.cigarstring
             loc = read.reference_start
-            #match = str(length)+'M'
-            #if cigar != match:
-            #    genome='unaligned'
+            match = str(length)+'M'
+            if cigar != match:
+                genome='clipped'
         pairs.append([name, genome, loc, length, read.get_tags(), read.query_sequence])
         if count % 2 == 0:
             r1_multimapped = check_alt(pairs[0][1], pairs[0][4], pairs[0][3])
@@ -203,9 +204,9 @@ read_count = pd.DataFrame({'pb10_pb10': [results[0][1]],
                            'pb10_pputida': [results[0][3]]})
 read_count.to_csv(file+'_read_count.csv', index=False)
 
-plasmid_coverage = pd.DataFrame({'pb10_pb10':results[1][0], 
-                                 'pb10_ecoli':results[1][1], 
-                                 'pb10_pputida':results[1][2]})
+plasmid_coverage = pd.DataFrame({'pb10_pb10':results[1][1], 
+                                 'pb10_ecoli':results[1][2], 
+                                 'pb10_pputida':results[1][0]})
 plasmid_coverage.to_csv(file+'_plasmid_coverage.csv', index=False)
 
 with open(file+'_locations.txt', 'w') as file:
