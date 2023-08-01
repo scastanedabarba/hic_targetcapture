@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+from Bio.Blast.Applications import NcbiblastnCommandline
 
 def extract_links(bam_file, out_name):
     """
@@ -48,11 +49,11 @@ def extract_links(bam_file, out_name):
         if not read.is_unmapped:
             name = read.query_name
             genome = genomes.get(read.reference_name)
-            #cigar = read.cigarstring
+            cigar = read.cigarstring
             loc = read.reference_start
-            #match = str(length)+'M'
-            #if cigar != match:
-            #    genome='unaligned'
+            match = str(length)+'M'
+            if cigar != match:
+                genome='clipped'
         pairs.append([name, genome, loc, length, read.get_tags(), read.query_sequence])
         if count % 2 == 0:
             r1_multimapped = check_alt(pairs[0][1], pairs[0][4], pairs[0][3])
@@ -87,7 +88,6 @@ def extract_links(bam_file, out_name):
                 pairs = []                   
                 
     data_df = pd.DataFrame(data, columns=['seqid', 'link', 'R1','R1length','R1loc','R2','R2length','R2loc'])
-    data_df.to_csv(out_name+'_pb10_unaligned.csv')
     return([[count/2, pB10_pB10, pB10_ecoli, pB10_unaligned], 
             [p_p, p_ecoli], 
             [pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc]], data_df)
@@ -169,26 +169,36 @@ p_unaligned = [0]*pb10_len
 
 os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/05_bwa_alignments/denovo/sorted/')
 input_file = sys.argv[1]
-file = input_file.split('_')[0]
+name = str(input_file).split('_')[0]
 
-results, reads = extract_links(str(input_file), file)
+results, reads = extract_links(str(input_file), name)
 
 os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/denovo/')
+
+reads.to_csv(name+'_pb10_unaligned.csv')
 
 read_count = pd.DataFrame({'pb10_pb10': [results[0][1]],
                            'pb10_ecoli': [results[0][2]],
                            'pB10_unaligned': [results[0][3]]})
-read_count.to_csv(file+'_read_count.csv', index=False)
+read_count.to_csv(name+'_read_count.csv', index=False)
 
 plasmid_coverage = pd.DataFrame({'pb10_pb10':results[1][0], 
                                  'pb10_ecoli':results[1][1]})
-plasmid_coverage.to_csv(file+'_plasmid_coverage.csv', index=False)
+plasmid_coverage.to_csv(name+'_plasmid_coverage.csv', index=False)
 
 
-with open(file+'_locations.txt', 'w') as file:
+with open(name+'_locations.txt', 'w') as file:
     file.write('pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc\n')
     for item in results[2]:
         file.write(str(item))
         file.write('\n')
+        
+out_name=name+"_pothosts.fasta"
 
-extract_pothosts(reads, file+"_pothosts.fasta")
+extract_pothosts(reads, out_name)
+
+out_name2 = name+'_blast.xml'
+
+cline = NcbiblastnCommandline(query=out_name, db='../../08_blast/pb10_probe_db', out=out_name2, 
+                                  outfmt="6 qseqid sseqid evalue bitscore pident nident", evalue=.0001)
+cline()

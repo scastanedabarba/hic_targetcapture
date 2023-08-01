@@ -197,7 +197,7 @@ results = extract_links(str(input_file))
 
 os.chdir('/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/enrichment_comparison/')
 
-file = input_file.split('_')[0]
+file = str(input_file).split('_')[0]
 
 read_count = pd.DataFrame({'pb10_pb10': [results[0][1]],
                            'pb10_ecoli': [results[0][2]],
