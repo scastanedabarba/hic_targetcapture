@@ -10,13 +10,19 @@
 
 ## Information about this repository:  
 
-This repository contains the code for the analysis carried out in the paper titled "Detection of rare plasmid hosts using a targeted Hi-C approach".  
+This repository contains the code for the analysis carried out in the paper titled "Detection of rare plasmid hosts using a targeted Hi-C approach". 
 
-### **File Description:**
-#### **Data obtained from PLSDB: [plsdb.tsv](https://github.com/scastanedabarba/plasmid_review_paper/blob/d8bad770b352d069dc2ec795595e12e17d53c6ce/plsdb.tsv) and [plsdb.abr](https://github.com/scastanedabarba/plasmid_review_paper/blob/d8bad770b352d069dc2ec795595e12e17d53c6ce/plsdb.abr)**
-The files named plsdb.tsv and plsdb.abr were downloaded from PLSDB, version 2021_06_23_v2. The file plsdb.tsv contains the meta-data for all the plasmids while the file plsdb.abr contains the resistance gene annotations. 
-#### **Code for meta-analysis: [plasmid_meta.py](https://github.com/scastanedabarba/plasmid_review_paper/blob/89ec7281a2420897379e42651eb493d6c0f4bee9/plasmid_meta.py)**
-The file named plasmid_meta.py contains the script for carrying out the meta-analysis in Figure 3. The columns 'Host_BIOSAMPLE' and 'IsolationSource_BIOSAMPLE' within plsdb.tsv contain metadata related to the source from which the plasmid was isolated. This information was used to determine whether each plasmid originated from Human, Animal, or Environmental habitats. 
-Lines 22 to 289 contain the dictionaries and code used for classification of plasmid sources into habitats. In lines 292 to 390, the ARG annotations are merged with the classification information and data is prepared for plotting.
+### **Analysis Descriptions:**
+The scripts are broken down into three main analysis; enrichment comparison, math model, and de novo analysis. The prefix for each script indicates the analysis it was used for. For each analysis, there are slurm, bash, and python scripts. These are indicated by the suffix. The slurm script in each analysis was used to run array jobs, therefore it is not described in more detail. The rest of the scripts are further described below. 
+
+#### **Enrichment comparison:**
+These scripts were used for comparing detection of plasmid-associated reads between Hi-C and Hi-C libraries. 
+
+#### **Math Model**
+These scripts were used for subsampling paired end reads, analysing count data and running math model.
+
+#### **De Novo**
+These scripts contain the code for carrying out the de novo analysis. 
+
 #### **Classified plasmid sources table: [classifications.csv](https://github.com/scastanedabarba/plasmid_review_paper/blob/89ec7281a2420897379e42651eb493d6c0f4bee9/classifications.csv)**
-The table classifications.csv contains the habitat to which each plasmid was assigned. The ACC_NUCCORE, Host_BIOSAMPLE, and IsolationSource_BIOSAMPLE columns from plsdb.tsv were also retained.
+
