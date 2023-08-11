@@ -186,7 +186,6 @@ plasmid_coverage = pd.DataFrame({'pb10_pb10':results[1][0],
                                  'pb10_ecoli':results[1][1]})
 plasmid_coverage.to_csv(name+'_plasmid_coverage.csv', index=False)
 
-
 with open(name+'_locations.txt', 'w') as file:
     file.write('pB10_pB10_loc, pB10_ecoli_loc, ecoli_pB10_loc\n')
     for item in results[2]:
@@ -200,5 +199,5 @@ extract_pothosts(reads, out_name)
 out_name2 = name+'_blast.xml'
 
 cline = NcbiblastnCommandline(query=out_name, db='../../08_blast/pb10_probe_db', out=out_name2, 
-                                  outfmt="6 qseqid sseqid evalue bitscore pident nident", evalue=.0001)
+                                  outfmt="6 qseqid sseqid evalue bitscore pident nident qstart qend sstart send")
 cline()
