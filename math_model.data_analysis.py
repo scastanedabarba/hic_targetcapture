@@ -106,4 +106,5 @@ for file in files:
     percent = (lib/total)*100            
     print('Library ', index, ' at ', depth, ' sequencing depth and trial ', trial, ' done ::: ', round(percent,2))
     
-df.to_csv("~/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_ouput/math_model/read_simulations.csv", index=False)
+    
+df.to_csv("/mnt/ceph/cast9836/00_projects/hic_targetcapture/06_output/math_model/read_simulations.csv", index=False)
