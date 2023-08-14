@@ -37,7 +37,7 @@ def extract_links(bam_file):
             match = str(length)+'M'
             loc = read.reference_start
             if cigar != match:
-                genome='unaligned'
+                genome='clipped'
         pairs.append([name, genome, loc, length, read.get_tags(), read])
         if count % 2 == 0:
             r1_multimapped = check_alt(pairs[0][1], pairs[0][4], pairs[0][3])
