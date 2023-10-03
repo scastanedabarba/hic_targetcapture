@@ -20,7 +20,7 @@ kraken_out=../06_output/de_novo/${PREFIX}_out.kraken2
 taxonomy_out=../06_output/de_novo/${PREFIX}_lineage.txt
 
 #run kraken and then use taxonkit+csvtk to generate file with taxonomic breakdown
-kraken2 --db ~/kraken_standard --threads 32 --confidence .5 --report $kraken_report $pothosts > $kraken_out
+kraken2 --db ~/kraken_standard --threads 32 --confidence .1 --report $kraken_report $pothosts > $kraken_out
 
 awk -F '\t' '{print $3}' $kraken_out \
     | taxonkit reformat -I 1 \

@@ -9,6 +9,6 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --array=0-12
 
-FILES=(../03_trimmed_reads/*R1.fastq.gz)
+FILES=(../02_benchmarking/*.fna)
 
 srun bash denovo.alignment.sh ${FILES[SLURM_ARRAY_TASK_ID]}head
