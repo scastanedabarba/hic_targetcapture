@@ -3,6 +3,7 @@
 #SBATCH --job-name=enrichment_comparison
 #SBATCH -o enrichment_comparison_%A_%a.out
 #SBATCH -e enrichment_comparison_%A_%a.error
+#SBATCH -C ceph
 #SBATCH -p eight
 #SBATCH --cpus-per-task=16
 #SBATCH --mail-user=cast9836@vandals.uidaho.edu
@@ -13,7 +14,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 conda activate base
 
 cd ../01_raw_data/
-FILES=(*R1.fastq.gz)
+FILES=(*1.fastq.gz)
 
 #run array job for each file
 srun bash ../00_scripts/enrichment_comparison.alignment.sh ${FILES[SLURM_ARRAY_TASK_ID]}
