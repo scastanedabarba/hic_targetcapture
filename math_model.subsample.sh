@@ -7,9 +7,9 @@ conda activate base
 
 FILE=$1
 
-base=$(basename $FILE _R1.fastq)
-R1=../07_subsampling/${base}_R1.fastq
-R2=../07_subsampling/${base}_R2.fastq
+base=$(basename $FILE _2.fastq)
+R1=../07_subsampling/${base}_1.fastq
+R2=../07_subsampling/${base}_2.fastq
 echo $R1
 echo $R2
 
@@ -22,8 +22,8 @@ do
         seed=$RANDOM
         outR1=../07_subsampling/subsampled/${base}_${depth}_${trial}_R1.fastq
         outR2=../07_subsampling/subsampled/${base}_${depth}_${trial}_R2.fastq
-        ~/miniconda3/envs/mamba_base/bin/seqtk sample -2 -s $seed $R1 $depth > $outR1
-        ~/miniconda3/envs/mamba_base/bin/seqtk sample -2 -s $seed $R2 $depth > $outR2
+        seqtk sample -2 -s $seed $R1 $depth > $outR1
+        seqtk sample -2 -s $seed $R2 $depth > $outR2
         echo trial $trial complete
     echo subsampling at $depth complete
     done

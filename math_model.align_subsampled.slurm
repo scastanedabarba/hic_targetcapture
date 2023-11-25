@@ -3,6 +3,7 @@
 #SBATCH --job-name=subsample_align
 #SBATCH -o subsample_align.out
 #SBATCH -e subsample_align.error
+#SBATCH -C ceph
 #SBATCH -p reg
 #SBATCH --cpus-per-task=8
 #SBATCH --mail-user=cast9836@vandals.uidaho.edu
