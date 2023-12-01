@@ -9,11 +9,11 @@ module load samblaster
 
 FILE=$1
 
-base=$(basename $FILE _R1.fastq.gz)
+base=$(basename $FILE _1.fastq.gz)
 
 #specify path to input files
-R1_in=../03_trimmed_reads/${base}_R1.fastq.gz
-R2_in=../03_trimmed_reads/${base}_R2.fastq.gz
+R1_in=../03_trimmed_reads/${base}_1.fastq.gz
+R2_in=../03_trimmed_reads/${base}_2.fastq.gz
 
 genome=../02_ref_genomes/ecoli_pb10.fasta 
 
